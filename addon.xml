@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.xtreamclient"
+version="2.4.0"
+name="Example Kodi Xtream Plugin"
+provider-name="HJ_G">
+<requires>
+  <import addon="xbmc.python" version="3.0.0"/>
+<!-- TODO: remove for release -->
+  <import addon="script.module.web-pdb" version="1.5.6"/>
+
+</requires>
+<extension point="xbmc.python.pluginsource" library="main.py">
+  <provides>video</provides>
+</extension>
+<extension point="xbmc.addon.metadata">
+  <summary lang="en">Example Kodi Xtream Plugin</summary>
+  <description lang="en_GB">An example Xtream plugin for Kodi mediacenter.</description>
+  <disclaimer lang="en_GB">Use at own risk. No warranty.</disclaimer>
+  <assets>
+    <icon>icon.png</icon>
+    <fanart>fanart.jpg</fanart>
+    <screenshot>resources\screenshot-01.jpg</screenshot>
+    <screenshot>resources\screenshot-02.jpg</screenshot>
+    <screenshot>resources\screenshot-03.jpg</screenshot>    
+    <screenshot>resources\screenshot-04.jpg</screenshot>    
+    <screenshot>resources\screenshot-05.jpg</screenshot>    
+  </assets>
+  <news>Updated with latest artwork metadata</news>
+</extension>
+</addon>
