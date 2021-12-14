@@ -1,6 +1,10 @@
-zip plugin.video.xtreamclient.zip addon.xml
-zip plugin.video.xtreamclient.zip Readme.md 
-zip plugin.video.xtreamclient.zip LICENSE.txt 
-zip plugin.video.xtreamclient.zip resources/*
-zip plugin.video.xtreamclient.zip *.py
+cp addon.xml ./plugin.video.xtreamclient/
+cp Readme.md ./plugin.video.xtreamclient/
+cp License.txt ./plugin.video.xtreamclient/
+cp -r resources ./plugin.video.xtreamclient/
+cp *.py ./plugin.video.xtreamclient/
+cp icon.png ./plugin.video.xtreamclient/
+cp fanart.jpg ./plugin.video.xtreamclient/
+
+zip -v -r plugin.video.xtreamclient.zip plugin.video.xtreamclient/*
 

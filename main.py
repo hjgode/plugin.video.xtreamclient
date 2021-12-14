@@ -105,6 +105,12 @@ def get_live_categories(myclient:Client, myfilter:str, myregex:str):
     cats=Categories()
     #TODO: remove for release
     #web_pdb.set_trace()
+    try:
+        p=re.compile(myfilter);
+    except Exception:
+        log("ERROR with regex: "+myfilter)
+    if p==None:
+        myregex='false'    
 
     log ("myfilter = "+myfilter+", regex="+myregex)
     if isinstance (mylist, list):        
@@ -112,7 +118,7 @@ def get_live_categories(myclient:Client, myfilter:str, myregex:str):
             if len(myfilter)>0:
                 if myregex=="true":
                     re.compile(myfilter)
-                    if re.match(myfilter, o['category_name']):
+                    if re.match(p, o['category_name']):
                         cats.add(o['category_name'], o['category_id'])    
                     pass
                 else:
@@ -397,7 +403,7 @@ def list_vod_categories():
     for category in categories:
         if len(filterstr)>0:
             if filterregex=="true":
-                if p.match(filterstr, category['category_name'])==None:
+                if re.match(p, category['category_name'])==None:
                     continue
             elif not category['category_name'].startswith(filterstr):
                 continue
