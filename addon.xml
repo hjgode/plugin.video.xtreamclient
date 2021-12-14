@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.xtreamclient"
-version="2.4.1"
+version="2.4.2"
 name="Example Kodi Xtream Plugin"
 provider-name="HJ_G">
 <requires>
