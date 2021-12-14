@@ -15,7 +15,7 @@ import xbmcplugin
 import xbmcaddon
 
 #TODO: remove for release
-import web_pdb
+#import web_pdb
 
 import re
 
@@ -34,6 +34,10 @@ def log(msg, level=xbmc.LOGINFO):
     xbmc.log("[%s] %s" % (plugin, msg.__str__()), level)
     
 log(CWD)
+
+def show_dialog(msg:str):
+    dialog = xbmcgui.Dialog()
+    ok = dialog.ok(ADDON.getAddonInfo('name'), msg)
 
 #for development use this
 #import xtreamcode_config as cfg
@@ -91,8 +95,13 @@ def get_vod_categories(myclient, myfilter):
 #    return mylist
 """
 
-def get_live_categories(myclient, myfilter:str, myregex:str):
+def get_live_categories(myclient:Client, myfilter:str, myregex:str):
     mylist = myclient.live_categories() #this returns a list of json objects
+    
+    if mylist==None:
+        error=myclient.get_last_error()
+        show_dialog("ERROR(getting Live cats): "+error)
+    
     cats=Categories()
     #TODO: remove for release
     #web_pdb.set_trace()
@@ -126,9 +135,13 @@ def start_connection():
 def get_Vod_categories():
     myclient=start_connection()
     categories=myclient.vod_categories()
+    if categories==None:
+        error=myclient.get_last_error()
+        show_dialog("ERROR (getting VOD cats): "+error)
     return categories
 
 def get_Live_categories():
+    '''this used globally to fill live categories without Kodi interface'''
     log('get_Live_categories...')
     myconfig=get_settings()
     myclient=start_connection()
@@ -137,8 +150,12 @@ def get_Live_categories():
     return categories    
 
 def get_Live_by_category(category):
+    '''this will be used to fill the video list filtered by the category'''
     myclient=start_connection()
     videos=myclient.live_streams_by_category(category)    
+    if videos==None:
+        error=myclient.get_last_error()
+        show_dialog("ERROR (3): "+error)
     mylist=[]
     if isinstance (videos, list):        
         for o in videos :
@@ -169,7 +186,11 @@ def get_Live_by_category(category):
 
 def get_vod_by_category(category):
     myclient=start_connection()
-    videos=myclient.vod_streams_by_category(category)    
+    videos=myclient.vod_streams_by_category(category)  
+    if videos==None:
+        error=myclient.get_last_error()
+        show_dialog("ERROR (4): "+error)
+  
     mylist=[]
     if isinstance (videos, list):        
         for o in videos :

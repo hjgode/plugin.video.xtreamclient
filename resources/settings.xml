@@ -7,7 +7,7 @@
 </category>
 <category label="Other Settings">
      <setting label="Filter settings" type="lsep"/>
-     <setting id="sett_filter" type="text" label="Filter" default="DE " />
+     <setting id="sett_filter" type="text" label="Filter" default="" />
      <setting id="sett_filter_is_regex" type="bool" label="Use regex for filter" default="false" subsetting="true"/>
 </category>
 </settings>

@@ -131,6 +131,7 @@ def get_series_categories_list(myclient:Client, myfilter:str):
   global myinfo
   myinfo=None
   data=myclient.series_categories()
+  
   mylist=[]
   log ("myfilter="+myfilter)
   if isinstance (data, list):        
@@ -274,7 +275,7 @@ def get_Series_by_category_list(myclient:Client,category_name:str,category_id:st
 """
 
 def list_series_categories():
-    log("### list_series_by_category")
+    log("### list_series_category()...")
     """
     Create the list of video categories in the Kodi interface.
     """
@@ -394,7 +395,7 @@ def list_seasons_in_serie(category_name:str, serie_name:str, serie_id:str):
         # TODO: add number of episodes to season info?
         print(str(season_number)+":"+season_name+" ("+str(episode_count)+")")
 
-        list_item.setInfo('video', {'title': season_name,
+        list_item.setInfo('video', {'title': season_name+" ("+str(episode_count)+")",
                                     'season' : season_number,
                                     'set': season['id'],
                                     'mediatype': 'video',

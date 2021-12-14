@@ -10,3 +10,4 @@ I wrote this to learn a bit about python and Kodi, so this is not perfect code a
 The plugin.video.xtreamclient supports filtering. Either simply looking at the start of category names or using a regex. So I can filter only categories starting with "DE " or all categories having "DE " or "TR " (regex for this is "^(DE |TR )" for all categories starting with "DE " or "TR ". See plugin>Other Settings.).
 
 License: [GPL v.3](http://www.gnu.org/copyleft/gpl.html)
+

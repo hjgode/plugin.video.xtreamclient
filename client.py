@@ -1,4 +1,5 @@
 import requests
+from requests.models import Response
 
 from connection import Connection
 from url_api_builder import EndpointEnum, Url_api_builder
@@ -7,6 +8,7 @@ from url_api_builder import EndpointEnum, Url_api_builder
 class Client:
     def __init__(self, url: str):
         self._url = url
+        self.last_error="None"
         self.matched, self._connection = Connection.from_url(url)
 
     def user_panel(self):
@@ -54,8 +56,37 @@ class Client:
         return self._get(EndpointEnum.CATCHUP)
 
     def _get(self, ep: EndpointEnum, *args):
+        r = Response
+        r.status_code=200
+        self.last_error="None"
         try:
             r = requests.get(Url_api_builder.build(ep, self._connection, *args))
+            if r.status_code==200:
+                self.last_error="None"
+                return r.json()
+#            return r.json() if r.status_code == 200 else None
+        except requests.exceptions.HTTPError as e:
+            print('HTTP Error')
+            self.last_error='HTTP Error'
+            print(e)
+        except requests.exceptions.ConnectionError as e:
+            print("ConnectionError")
+            self.last_error='ConnectionError'
+            print(e)
         except requests.exceptions.RequestException as e:
-            print(e.strerror)
-        return r.json() if r.status_code == 200 else None
+            print("RequestException")
+            self.last_error="RequestException"
+            print(e)
+        except Exception as e:
+            self.last_error=e.__doc__
+        return None
+#        if r.status_code ==200:
+#            return r.json()
+#        else:
+#            return None
+#        return r.json() if r.status_code == 200 else None
+
+    def get_last_error(self):
+        if self.last_error==None:
+            self.last_error="unknown, see log"
+        return self.last_error
