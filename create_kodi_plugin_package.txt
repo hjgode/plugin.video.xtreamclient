@@ -1,0 +1,6 @@
+zip plugin.video.xtreamclient.zip addon.xml
+zip plugin.video.xtreamclient.zip Readme.md 
+zip plugin.video.xtreamclient.zip LICENSE.txt 
+zip plugin.video.xtreamclient.zip resources/*
+zip plugin.video.xtreamclient.zip *.py
+

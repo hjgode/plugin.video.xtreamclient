@@ -54,5 +54,8 @@ class Client:
         return self._get(EndpointEnum.CATCHUP)
 
     def _get(self, ep: EndpointEnum, *args):
-        r = requests.get(Url_api_builder.build(ep, self._connection, *args))
+        try:
+            r = requests.get(Url_api_builder.build(ep, self._connection, *args))
+        except requests.exceptions.RequestException as e:
+            print(e.strerror)
         return r.json() if r.status_code == 200 else None

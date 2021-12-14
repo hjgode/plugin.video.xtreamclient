@@ -331,7 +331,8 @@ def list_series_in_category(category_name:str, category_id:str):
     list[] with dicts print(series_for_category[0].keys())
     dict_keys(['name', 'series_id', 'thumb', 'category_name', 'category_id', 'plot'])
     """
-    # Iterate through videos.
+    # Iterate through the series.
+    #TODO: add total episodes count? But that would require to get every series info for the listed series
     for serie in series:
         serie_id=serie['series_id']
         serie_name=serie['name']
@@ -366,7 +367,9 @@ def list_seasons_in_serie(category_name:str, serie_name:str, serie_id:str):
     data=get_myinfo(serie_id) # myclient.series_info_by_id(series_id)
     serie_info=data['info'] # a dict
     seasons=data['seasons'] # a list
-    season_name=serie_info['name']
+    episodes=data['episodes'] # a dict
+    season_name=serie_info['name'] 
+    # not all season in seasons is provided, so check if season is in episodes.keys
     xbmcplugin.setPluginCategory(_HANDLE, serie_name+":"+category_name)
     xbmcplugin.setContent(_HANDLE, 'videos')
     """  
@@ -381,10 +384,16 @@ def list_seasons_in_serie(category_name:str, serie_name:str, serie_id:str):
         episode_count=season['episode_count']
         season_number=season['season_number']
         season_name=season['name']
+        if not str(season_number) in episodes.keys():
+          log("Season "+str(season_number)+" is not available")
+          continue
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=season_name)
         # Set additional info for the list item.
         # 'mediatype' is needed for skin to display info for this ListItem correctly.
+        # TODO: add number of episodes to season info?
+        print(str(season_number)+":"+season_name+" ("+str(episode_count)+")")
+
         list_item.setInfo('video', {'title': season_name,
                                     'season' : season_number,
                                     'set': season['id'],
@@ -416,7 +425,7 @@ def list_seasons_in_serie(category_name:str, serie_name:str, serie_id:str):
 
 def list_episodes_in_season(season_number:str, serie_name:str, serie_id:str):
     #TODO FIXME for right info
-    log("### list_episodes_in_serie")
+    log("### list_episodes_in_season")
     xbmcplugin.setPluginCategory(_HANDLE, serie_name+"/"+season_number)
     xbmcplugin.setContent(_HANDLE, 'episodes')
     data=get_myinfo(serie_id) # myclient.series_info_by_id(series_id)
@@ -430,37 +439,60 @@ def list_episodes_in_season(season_number:str, serie_name:str, serie_id:str):
      season 1: dict_keys(['air_date', 'episode_count', 'id', 'name', 'overview', 'season_number', 
      'cover', 'cover_big'])
     """
-    season_number=season_number
-    for episode_num in episodes.keys(): # episodes is a dict
-        for video in episodes[episode_num]:
-            extension=video['container_extension']
-            direct_source=video['direct_source'] #+"."+extension
-            episode_num=video['episode_num']        
-            # Create a list item with a text label and a thumbnail image.
-            list_item = xbmcgui.ListItem(label=serie_name)
-            # Set additional info for the list item.
-            # 'mediatype' is needed for skin to display info for this ListItem correctly.
-            list_item.setInfo('video', {'title': video['title'],
-                                        'set': season_number,
-                                        'mediatype': 'video',
-                                        'plot' : video['info']['plot'],
-                                        'video' : direct_source,
-                                        })
-            # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
-            # Here we use the same image for all items for simplicity's sake.
-            # In a real-life plugin you need to set each image accordingly.
-            list_item.setArt({'thumb': video['info']['movie_image'], 'icon': video['info']['movie_image'], 'fanart': video['info']['cover_big']})
-            # Set 'IsPlayable' property to 'true'.
-            # This is mandatory for playable items!
-            list_item.setProperty('IsPlayable', 'true')
-            # Create a URL for a plugin recursive call.
-            # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/wp-content/uploads/2017/04/crab.mp4
-            url = get_url(action='play', video=direct_source)
-            # Add the list item to a virtual Kodi folder.
-            # is_folder = False means that this item won't open any sub-list.
-            is_folder = False
-            # Add our item to the Kodi virtual folder listing.
-            xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
+    if not season_number in episodes.keys(): ##episodes[season_number]==None: # gives exception KeyError
+      list_item = xbmcgui.ListItem(label=serie_name)
+      list_item.setInfo('video', {'title': "N/A",
+                                 })
+      list_item.setProperty('IsPlayable', 'false')
+      is_folder = False
+#      url = get_url(action='list_seasons_in_serie', category_name, serie_name, serie_id)
+      # Add our item to the Kodi virtual folder listing.
+#      xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
+      # Add a sort method for the virtual folder items (alphabetically, ignore articles)
+      xbmcplugin.addSortMethod(_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+      # Finish creating a virtual folder.
+      xbmcplugin.endOfDirectory(_HANDLE)
+      return 
+
+    if episodes[season_number]==None:
+      return 
+    for video in episodes[season_number]:
+        myplot=""
+        try:
+          myplot=video['info']['plot']
+        except Exception:
+          log("ERROR: Missing plot for video")
+          log("video dict: "+str(video['info']))
+          myplot=""
+        
+        extension=video['container_extension']
+        direct_source=video['direct_source'] #+"."+extension
+        episode_num=video['episode_num']        
+        # Create a list item with a text label and a thumbnail image.
+        list_item = xbmcgui.ListItem(label=serie_name)
+        # Set additional info for the list item.
+        # 'mediatype' is needed for skin to display info for this ListItem correctly.
+        list_item.setInfo('video', {'title': video['title'],
+                                    'set': season_number,
+                                    'mediatype': 'video',
+                                    'plot' : myplot,
+                                    'video' : direct_source,
+                                    })
+        # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
+        # Here we use the same image for all items for simplicity's sake.
+        # In a real-life plugin you need to set each image accordingly.
+        list_item.setArt({'thumb': video['info']['movie_image'], 'icon': video['info']['movie_image'], 'fanart': video['info']['cover_big']})
+        # Set 'IsPlayable' property to 'true'.
+        # This is mandatory for playable items!
+        list_item.setProperty('IsPlayable', 'true')
+        # Create a URL for a plugin recursive call.
+        # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/wp-content/uploads/2017/04/crab.mp4
+        url = get_url(action='play', video=direct_source)
+        # Add the list item to a virtual Kodi folder.
+        # is_folder = False means that this item won't open any sub-list.
+        is_folder = False
+        # Add our item to the Kodi virtual folder listing.
+        xbmcplugin.addDirectoryItem(_HANDLE, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore articles)
     xbmcplugin.addSortMethod(_HANDLE, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
