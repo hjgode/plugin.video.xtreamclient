@@ -1,5 +1,7 @@
 # Simple xtream example plugin for Kodi mediacenter
 
+a newer version with smarter exception handling is at https://github.com/hjgode/plugin.video.xtreamclient2
+
 This is a simple yet fully functional example of a xtream client video plugin for [Kodi](http://kodi.tv) mediacenter, version 19 (Matrix).
 Please read the comments in the plugin code for more details.
 An installable .zip can be downloaded from "[Releases]" tab.
